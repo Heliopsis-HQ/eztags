@@ -359,9 +359,9 @@ class eZTagsObject extends eZPersistentObject
     {
         $pathArray = explode( '/', trim( $this->PathString, '/' ) );
 
-        if ( $this->MainNodeID > 0 )
+        if ( $this->MainTagID > 0 )
         {
-            array_push( $pathArray, $this->MainNodeID );
+            array_push( $pathArray, $this->MainTagID );
         }
 
         if ( !empty( $pathArray ) )
@@ -666,10 +666,14 @@ class eZTagsObject extends eZPersistentObject
             $fetchParams['depth'] = array( $sqlDepthOperator, $depth );
         }
 
-        $limits = array( 'offset' => $offset );
-
+        $limits = null;
         if ( $limit > 0 )
-            $limits['limit'] = $limit;
+        {
+            $limits = array(
+                'offset' => $offset,
+                'limit' => $limit,
+            );
+        }
 
         $sorts = array();
         if ( !empty( $sortBy ) )
