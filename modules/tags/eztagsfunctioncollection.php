@@ -13,17 +13,38 @@ class eZTagsFunctionCollection
      * @param integer $tag_id
      * @return array
      */
-    static public function fetchTag( $tag_id )
+    static public function fetchTag( $tag_id, $remote_id = false )
     {
-        $result = eZTagsObject::fetch( $tag_id );
+    	$eztagsINI = eZINI::instance( 'eztags.ini' );
+    	$showHidden = $eztagsINI->variable( 'VisibilitySettings', 'ShowHiddenTags' ) === 'enabled';
 
-        $eztagsINI = eZINI::instance( 'eztags.ini' );
-        $showHidden = $eztagsINI->variable( 'VisibilitySettings', 'ShowHiddenTags' ) === 'enabled';
-
-        if( $result instanceof eZTagsObject && ( $showHidden || $result->isVisible() ) )
-            return array( 'result' => $result );
+    	if ( $tag_id === false && $remote_id !== false )
+        {
+            $tag = eZTagsObject::fetchByRemoteID( $remote_id );
+        }
         else
-            return array( 'result' => false );
+        {
+            $tag = eZTagsObject::fetch( $tag_id );
+        }
+
+        if ( $tag === null )
+        {
+            $result = array( 'error' => array( 'error_type' => 'kernel',
+                                               'error_code' => eZError::KERNEL_NOT_FOUND ) );
+        }
+        else
+        {
+        	if( $tag instanceof eZTagsObject && ( $showHidden || $result->isVisible() ) )
+        	{
+        		$result = array( 'result' => $tag );
+        	}
+        	else
+        	{
+        		$result = array( 'result' => false );
+        	}
+        }
+
+        return $result;
     }
 
     /**
