@@ -34,7 +34,7 @@ class eZTagsFunctionCollection
         }
         else
         {
-        	if( $tag instanceof eZTagsObject && ( $showHidden || $result->isVisible() ) )
+        	if( $tag instanceof eZTagsObject && ( $showHidden || $tag->isVisible() ) )
         	{
         		$result = array( 'result' => $tag );
         	}
