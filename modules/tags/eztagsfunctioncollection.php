@@ -13,35 +13,17 @@ class eZTagsFunctionCollection
      * @param integer $tag_id
      * @return array
      */
-    static public function fetchTag( $tag_id, $remote_id = false )
+    static public function fetchTag( $tag_id )
     {
-    	$eztagsINI = eZINI::instance( 'eztags.ini' );
-    	$showHidden = $eztagsINI->variable( 'VisibilitySettings', 'ShowHiddenTags' ) === 'enabled';
+        $result = eZTagsObject::fetch( $tag_id );
 
-    	if ( $tag_id === false && $remote_id !== false )
+       	if( $tag instanceof eZTagsObject && ( $showHidden || $tag->isVisible() ) )
         {
-            $tag = eZTagsObject::fetchByRemoteID( $remote_id );
+        	$result = array( 'result' => $tag );
         }
         else
         {
-            $tag = eZTagsObject::fetch( $tag_id );
-        }
-
-        if ( $tag === null )
-        {
-            $result = array( 'error' => array( 'error_type' => 'kernel',
-                                               'error_code' => eZError::KERNEL_NOT_FOUND ) );
-        }
-        else
-        {
-        	if( $tag instanceof eZTagsObject && ( $showHidden || $tag->isVisible() ) )
-        	{
-        		$result = array( 'result' => $tag );
-        	}
-        	else
-        	{
-        		$result = array( 'result' => false );
-        	}
+        	$result = array( 'result' => false );
         }
 
         return $result;
@@ -62,6 +44,23 @@ class eZTagsFunctionCollection
         $result = eZTagsObject::fetchByKeyword( $keyword, $showHidden );
 
         if( is_array( $result ) && !empty( $result ) )
+            return array( 'result' => $result );
+        else
+            return array( 'result' => false );
+    }
+
+    /**
+     * Fetches tag identified with provided remote_id
+     *
+     * @static
+     * @param string $remote_id
+     * @return array
+     */
+    static public function fetchTagByRemoteID( $remote_id )
+    {
+        $result = eZTagsObject::fetchByRemoteID( $remote_id );
+
+        if( $result instanceof eZTagsObject )
             return array( 'result' => $result );
         else
             return array( 'result' => false );
