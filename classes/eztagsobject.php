@@ -453,9 +453,20 @@ class eZTagsObject extends eZPersistentObject
      * @param integer $id
      * @return eZTagsObject
      */
-    static function fetch( $id )
+    static function fetch( $id, $ignoreVisibility = null )
     {
-        return eZPersistentObject::fetchObject( self::definition(), null, array( 'id' => $id ) );
+        if( $ignoreVisibility === null )
+        {
+            $ignoreVisibility = eZTagsObject::showHiddenTagsEnabled();
+        }
+
+        $cond = array( 'id' => $id );
+        if( !$ignoreVisibility )
+        {
+            $cond['hidden'] = 0;
+        }
+
+        return eZPersistentObject::fetchObject( self::definition(), null, $cond );
     }
 
     /**
@@ -552,12 +563,17 @@ class eZTagsObject extends eZPersistentObject
      * @param boolean $showHidden
      * @return array
      */
-    static function fetchByKeyword( $keyword, $showHidden = true )
+    static function fetchByKeyword( $keyword, $ignoreVisibility = null )
     {
         $cond = array();
         $customCond = null;
 
-        if( !$showHidden )
+        if( $ignoreVisibility === null )
+        {
+            $ignoreVisibility = eZTagsObject::showHiddenTagsEnabled();
+        }
+
+        if( !$ignoreVisibility )
         {
             $cond['hidden'] = 0;
         }
@@ -728,7 +744,7 @@ class eZTagsObject extends eZPersistentObject
         $depth           = ( isset( $params['Depth'] ) )                                   ? $params['Depth']                  : false;
         $depthOperator   = ( isset( $params['DepthOperator'] ) )                           ? $params['DepthOperator']          : false;
         $includeSynonyms = ( isset( $params['IncludeSynonyms'] ) )                         ? (bool) $params['IncludeSynonyms'] : false;
-        $showHidden      = ( isset( $params['ShowHidden'] ) )                              ? (bool) $params['ShowHidden']      : true;
+        $showHidden      = ( isset( $params['IgnoreVisibility'] ) )                        ? (bool) $params['IgnoreVisibility']: self::showHiddenTagsEnabled();
 
         $fetchParams = array();
 
@@ -841,7 +857,7 @@ class eZTagsObject extends eZPersistentObject
         $depth           = ( isset( $params['Depth'] ) )                                   ? $params['Depth']                  : false;
         $depthOperator   = ( isset( $params['DepthOperator'] ) )                           ? $params['DepthOperator']          : false;
         $includeSynonyms = ( isset( $params['IncludeSynonyms'] ) )                         ? (bool) $params['IncludeSynonyms'] : false;
-        $showHidden      = ( isset( $params['ShowHidden'] ) )                              ? (bool) $params['ShowHidden']      : true;
+        $showHidden      = ( isset( $params['IgnoreVisibility'] ) )                        ? (bool) $params['IgnoreVisibility']: self::showHiddenTagsEnabled();
 
         $fetchParams = array();
 
@@ -983,6 +999,17 @@ class eZTagsObject extends eZPersistentObject
         {
             $this->setAttribute( 'hidden', intval( $this->attribute( 'hidden' ) ) & ~self::VISIBILITY_INVISIBLE );
         }
+    }
+
+    /**
+     * Indicates wether hidden tags should shown
+     * as set in eztags.ini
+     * @return boolean
+     */
+    public static function showHiddenTagsEnabled()
+    {
+        $eztagsINI = eZINI::instance( 'eztags.ini' );
+        return !$eztagsINI->hasVariable( 'VisibilitySettings', 'ShowHiddenTags' ) || $eztagsINI->variable( 'VisibilitySettings', 'ShowHiddenTags' ) === 'enabled';
     }
 
 }

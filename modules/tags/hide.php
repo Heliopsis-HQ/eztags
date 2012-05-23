@@ -4,8 +4,6 @@ $http = eZHTTPTool::instance();
 
 $tagID = (int) $Params['TagID'];
 $action = $Params['Action'];
-$deleteAllowed = true;
-$error = '';
 
 if ( $tagID <= 0 )
 {
@@ -20,13 +18,13 @@ if ( !( $tag instanceof eZTagsObject ) )
 
 if( !trim( $action ) )
 {
-    if( $tag->isVisible() )
-    {
-        $action = 'hide';
-    }
-    elseif( $tag->isHidden() )
+    if( $tag->isHidden() )
     {
         $action = 'unhide';
+    }
+    else
+    {
+        $action = 'hide';
     }
 }
 
@@ -58,16 +56,12 @@ foreach( $synonyms as $synonym )
 }
 
 //hide descendant tags
-$subtags = $tag->fetchByPathString( $tag->attribute( 'path_string' ) );
-foreach( $subtags as $subtag )
-{
-    if( $subtag != $tag )
-    {
-        $subtag->setInvisible( $doHide );
-        $subtag->updateModified();
-        $subtag->store();
-    }
-}
+$bitwiseOperator = $doHide ? '|' : '& ~';
+$sql = 'UPDATE eztags
+			SET hidden = hidden' . $bitwiseOperator . eZTagsObject::VISIBILITY_INVISIBLE .',
+				modified = ' . time() . '
+			WHERE path_string LIKE "' . $tag->attribute( 'path_string' ) . '%"';
+$db->query( $sql );
 
 $db->commit();
 
