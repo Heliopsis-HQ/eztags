@@ -621,15 +621,16 @@ class eZTagsObject extends eZPersistentObject
      *
      * @param int $id
      * @param mixed $locale
+     * @param bool $ignoreVisibility
      *
      * @return eZTagsObject
      */
-    static public function fetch( $id, $locale = false )
+    static public function fetch( $id, $locale = false, $ignoreVisibility = null )
     {
         if ( is_string( $locale ) )
-            $tags = self::fetchList( array( 'id' => $id ), null, null, false, $locale );
+            $tags = self::fetchList( array( 'id' => $id ), null, null, false, $locale, $ignoreVisibility );
         else
-            $tags = self::fetchList( array( 'id' => $id ) );
+            $tags = self::fetchList( array( 'id' => $id ), null, null, false, false, $ignoreVisibility );
 
         if ( is_array( $tags ) && !empty( $tags ) )
             return $tags[0];
@@ -643,12 +644,13 @@ class eZTagsObject extends eZPersistentObject
      * @static
      *
      * @param int $id
+     * @param bool $ignoreVisibility
      *
      * @return eZTagsObject
      */
-    static public function fetchWithMainTranslation( $id )
+    static public function fetchWithMainTranslation( $id, $ignoreVisibility = null )
     {
-        $tags = self::fetchList( array( 'id' => $id ), null, null, true );
+        $tags = self::fetchList( array( 'id' => $id ), null, null, true, false, $ignoreVisibility );
 
         if ( is_array( $tags ) && !empty( $tags ) )
             return $tags[0];
@@ -664,14 +666,15 @@ class eZTagsObject extends eZPersistentObject
      * @param array $params
      * @param array $limits
      * @param array $sorts
-     * @param bool $mainTranslation
+     * @param bool  $mainTranslation
      * @param mixed $locale
+     * @param bool  $ignoreVisibility
      *
      * @return eZTagsObject[]
      */
-    static public function fetchList( $params, $limits = null, $sorts = null, $mainTranslation = false, $locale = false )
+    static public function fetchList( $params, $limits = null, $sorts = null, $mainTranslation = false, $locale = false, $ignoreVisibility = null )
     {
-        $customConds = self::fetchCustomCondsSQL( $params, $mainTranslation, $locale );
+        $customConds = self::fetchCustomCondsSQL( $params, $mainTranslation, $locale, $ignoreVisibility );
 
         if ( is_array( $params ) )
         {
@@ -722,14 +725,15 @@ class eZTagsObject extends eZPersistentObject
      * @static
      *
      * @param mixed $params
-     * @param bool $mainTranslation
+     * @param bool  $mainTranslation
      * @param mixed $locale
+     * @param bool  $ignoreVisibility
      *
      * @return int
      */
-    static public function fetchListCount( $params, $mainTranslation = false, $locale = false )
+    static public function fetchListCount( $params, $mainTranslation = false, $locale = false, $ignoreVisibility = null )
     {
-        $customConds = self::fetchCustomCondsSQL( $params, $mainTranslation, $locale );
+        $customConds = self::fetchCustomCondsSQL( $params, $mainTranslation, $locale, $ignoreVisibility );
 
         if ( is_array( $params ) )
         {
@@ -760,12 +764,13 @@ class eZTagsObject extends eZPersistentObject
      * @static
      *
      * @param mixed $params
-     * @param bool $mainTranslation
+     * @param bool  $mainTranslation
      * @param mixed $locale
+     * @param bool  $ignoreVisibility
      *
      * @return string
      */
-    static public function fetchCustomCondsSQL( $params, $mainTranslation = false, $locale = false )
+    static public function fetchCustomCondsSQL( $params, $mainTranslation = false, $locale = false, $ignoreVisibility = null )
     {
         $customConds = is_array( $params ) && !empty( $params ) ? " AND " : " WHERE ";
         $customConds .= " eztags.id = eztags_keyword.keyword_id ";
@@ -786,11 +791,11 @@ class eZTagsObject extends eZPersistentObject
             $customConds .= " AND " . eZContentLanguage::sqlFilter( 'eztags_keyword', 'eztags' ) . " ";
         }
 
-        $ignoreVisibility = eZINI::instance( 'eztags.ini' )->variable( 'VisibilitySettings', 'ShowHiddenTags' ) === 'enabled';
+        if( $ignoreVisibility === null )
+            $ignoreVisibility = eZINI::instance( 'eztags.ini' )->variable( 'VisibilitySettings', 'ShowHiddenTags' ) === 'enabled';
+
         if( !$ignoreVisibility )
-        {
             $customConds .= " AND eztags.hidden = 0 ";
-        }
 
         return $customConds;
     }
@@ -841,12 +846,13 @@ class eZTagsObject extends eZPersistentObject
      *
      * @param int $parentID
      * @param bool $mainTranslation
+     * @param bool $ignoreVisibility
      *
      * @return eZTagsObject[]
      */
-    static public function fetchByParentID( $parentID, $mainTranslation = false )
+    static public function fetchByParentID( $parentID, $mainTranslation = false, $ignoreVisibility = null )
     {
-        return self::fetchList( array( 'parent_id' => $parentID, 'main_tag_id' => 0 ), null, null, $mainTranslation );
+        return self::fetchList( array( 'parent_id' => $parentID, 'main_tag_id' => 0 ), null, null, $mainTranslation, false, $ignoreVisibility );
     }
 
     /**
@@ -856,12 +862,13 @@ class eZTagsObject extends eZPersistentObject
      *
      * @param int $parentID
      * @param bool $mainTranslation
+     * @param bool $ignoreVisibility
      *
      * @return int
      */
-    static public function childrenCountByParentID( $parentID, $mainTranslation = false )
+    static public function childrenCountByParentID( $parentID, $mainTranslation = false, $ignoreVisibility = null )
     {
-        return self::fetchListCount( array( 'parent_id' => $parentID, 'main_tag_id' => 0 ), $mainTranslation );
+        return self::fetchListCount( array( 'parent_id' => $parentID, 'main_tag_id' => 0 ), $mainTranslation, false, $ignoreVisibility );
     }
 
     /**
@@ -876,7 +883,7 @@ class eZTagsObject extends eZPersistentObject
      */
     static public function fetchSynonyms( $mainTagID, $mainTranslation = false )
     {
-        return self::fetchList( array( 'main_tag_id' => $mainTagID ), null, null, $mainTranslation );
+        return self::fetchList( array( 'main_tag_id' => $mainTagID ), null, null, $mainTranslation, false, true );
     }
 
     /**
@@ -891,7 +898,7 @@ class eZTagsObject extends eZPersistentObject
      */
     static public function synonymsCount( $mainTagID, $mainTranslation = false )
     {
-        return self::fetchListCount( array( 'main_tag_id' => $mainTagID ), $mainTranslation );
+        return self::fetchListCount( array( 'main_tag_id' => $mainTagID ), $mainTranslation, false, true );
     }
 
     /**
@@ -901,12 +908,13 @@ class eZTagsObject extends eZPersistentObject
      *
      * @param mixed $keyword
      * @param bool $mainTranslation
+     * @param bool $ignoreVisibility
      *
      * @return eZTagsObject[]
      */
-    static public function fetchByKeyword( $keyword, $mainTranslation = false )
+    static public function fetchByKeyword( $keyword, $mainTranslation = false, $ignoreVisibility = null )
     {
-        return self::fetchList( array( 'keyword' => $keyword ), null, null, $mainTranslation );
+        return self::fetchList( array( 'keyword' => $keyword ), null, null, $mainTranslation, false, $ignoreVisibility );
     }
 
     /**
@@ -916,13 +924,14 @@ class eZTagsObject extends eZPersistentObject
      *
      * @param string $pathString
      * @param bool $mainTranslation
+     * @param bool $ignoreVisibility
      *
      * @return eZTagsObject[]
      */
-    static public function fetchByPathString( $pathString, $mainTranslation = false )
+    static public function fetchByPathString( $pathString, $mainTranslation = false, $ignoreVisibility = null )
     {
         return self::fetchList( array( 'path_string' => array( 'like', $pathString . '%' ),
-                                       'main_tag_id' => 0 ), null, null, $mainTranslation );
+                                       'main_tag_id' => 0 ), null, null, $mainTranslation, false, $ignoreVisibility );
     }
 
     /**
@@ -932,12 +941,13 @@ class eZTagsObject extends eZPersistentObject
      *
      * @param string $remoteID
      * @param bool $mainTranslation
+     * @param bool $ignoreVisibility
      *
      * @return eZTagsObject|null
      */
-    static public function fetchByRemoteID( $remoteID, $mainTranslation = false )
+    static public function fetchByRemoteID( $remoteID, $mainTranslation = false, $ignoreVisibility = null )
     {
-        $tagsList = self::fetchList( array( 'remote_id' => $remoteID ), null, null, $mainTranslation );
+        $tagsList = self::fetchList( array( 'remote_id' => $remoteID ), null, null, $mainTranslation, false, $ignoreVisibility );
 
         if ( is_array( $tagsList ) && !empty( $tagsList ) )
             return $tagsList[0];
@@ -1099,12 +1109,13 @@ class eZTagsObject extends eZPersistentObject
         if ( !is_array( $params ) )
             $params = array();
 
-        $offset          = ( isset( $params['Offset'] ) && (int) $params['Offset'] > 0 )   ? (int) $params['Offset']           : 0;
-        $limit           = ( isset( $params['Limit'] ) && (int) $params['Limit'] > 0 )     ? (int) $params['Limit']            : 0;
-        $sortBy          = ( isset( $params['SortBy'] ) && is_array( $params['SortBy'] ) ) ? $params['SortBy']                 : array();
-        $depth           = ( isset( $params['Depth'] ) )                                   ? $params['Depth']                  : false;
-        $depthOperator   = ( isset( $params['DepthOperator'] ) )                           ? $params['DepthOperator']          : false;
-        $includeSynonyms = ( isset( $params['IncludeSynonyms'] ) )                         ? (bool) $params['IncludeSynonyms'] : false;
+        $offset           = ( isset( $params['Offset'] ) && (int) $params['Offset'] > 0 )   ? (int) $params['Offset']            : 0;
+        $limit            = ( isset( $params['Limit'] ) && (int) $params['Limit'] > 0 )     ? (int) $params['Limit']             : 0;
+        $sortBy           = ( isset( $params['SortBy'] ) && is_array( $params['SortBy'] ) ) ? $params['SortBy']                  : array();
+        $depth            = ( isset( $params['Depth'] ) )                                   ? $params['Depth']                   : false;
+        $depthOperator    = ( isset( $params['DepthOperator'] ) )                           ? $params['DepthOperator']           : false;
+        $includeSynonyms  = ( isset( $params['IncludeSynonyms'] ) )                         ? (bool) $params['IncludeSynonyms']  : false;
+        $ignoreVisibility = ( isset( $params['IgnoreVisibility'] ) )                        ? (bool) $params['IgnoreVisibility'] : null;
 
         $fetchParams = array();
 
@@ -1183,7 +1194,7 @@ class eZTagsObject extends eZPersistentObject
         if ( empty( $sorts ) )
             $sorts = null;
 
-        $fetchResults = self::fetchList( $fetchParams, $limits, $sorts );
+        $fetchResults = self::fetchList( $fetchParams, $limits, $sorts, false, false, $ignoreVisibility );
 
         if ( is_array( $fetchResults ) && !empty( $fetchResults ) )
             return $fetchResults;
@@ -1213,9 +1224,10 @@ class eZTagsObject extends eZPersistentObject
         if ( !is_array( $params ) )
             $params = array();
 
-        $depth           = ( isset( $params['Depth'] ) )                                   ? $params['Depth']                  : false;
-        $depthOperator   = ( isset( $params['DepthOperator'] ) )                           ? $params['DepthOperator']          : false;
-        $includeSynonyms = ( isset( $params['IncludeSynonyms'] ) )                         ? (bool) $params['IncludeSynonyms'] : false;
+        $depth            = ( isset( $params['Depth'] ) )                                   ? $params['Depth']                   : false;
+        $depthOperator    = ( isset( $params['DepthOperator'] ) )                           ? $params['DepthOperator']           : false;
+        $includeSynonyms  = ( isset( $params['IncludeSynonyms'] ) )                         ? (bool) $params['IncludeSynonyms']  : false;
+        $ignoreVisibility = ( isset( $params['IgnoreVisibility'] ) )                        ? (bool) $params['IgnoreVisibility'] : null;
 
         $fetchParams = array();
 
@@ -1251,7 +1263,7 @@ class eZTagsObject extends eZPersistentObject
             $fetchParams['depth'] = array( $sqlDepthOperator, $depth );
         }
 
-        $count = self::fetchListCount( $fetchParams );
+        $count = self::fetchListCount( $fetchParams, false, false, $ignoreVisibility );
 
         if ( is_numeric( $count ) )
             return $count;

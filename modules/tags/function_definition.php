@@ -11,7 +11,11 @@ $FunctionList['tag'] = array( 'name'        => 'tag',
                                                       array( 'name'     => 'language',
                                                              'type'     => 'string',
                                                              'required' => false,
-                                                             'default'  => false ) ) );
+                                                             'default'  => false ),
+                                                      array( 'name'     => 'ignore_visibility',
+                                                             'type'     => 'bool',
+                                                             'required' => false,
+                                                             'default'  => null ) ) );
 
 $FunctionList['tags_by_keyword'] = array( 'name'        => 'tags_by_keyword',
                                           'call_method' => array( 'class'  => 'eZTagsFunctionCollection',
@@ -22,7 +26,11 @@ $FunctionList['tags_by_keyword'] = array( 'name'        => 'tags_by_keyword',
                                                                   array( 'name'     => 'language',
                                                                          'type'     => 'string',
                                                                          'required' => false,
-                                                                         'default'  => false ) ) );
+                                                                         'default'  => false ),
+                                                                  array( 'name'     => 'ignore_visibility',
+                                                                         'type'     => 'bool',
+                                                                         'required' => false,
+                                                                         'default'  => null ) ) );
 
 $FunctionList['tag_by_remote_id'] = array( 'name'        => 'tag_by_remote_id',
                                            'call_method' => array( 'class'  => 'eZTagsFunctionCollection',
@@ -33,7 +41,11 @@ $FunctionList['tag_by_remote_id'] = array( 'name'        => 'tag_by_remote_id',
                                                                    array( 'name'     => 'language',
                                                                           'type'     => 'string',
                                                                           'required' => false,
-                                                                          'default'  => false ) ) );
+                                                                          'default'  => false ),
+                                                                   array( 'name'     => 'ignore_visibility',
+                                                                          'type'     => 'bool',
+                                                                          'required' => false,
+                                                                          'default'  => null ) ) );
 
 $FunctionList['list'] = array( 'name'        => 'list',
                                'call_method' => array( 'class'  => 'eZTagsFunctionCollection',
@@ -68,7 +80,11 @@ $FunctionList['list'] = array( 'name'        => 'list',
                                                        array( 'name'     => 'language',
                                                               'type'     => 'string',
                                                               'required' => false,
-                                                              'default'  => false ) ) );
+                                                              'default'  => false ),
+                                                       array( 'name'     => 'ignore_visibility',
+                                                              'type'     => 'bool',
+                                                              'required' => false,
+                                                              'default'  => null ) ) );
 
 $FunctionList['list_count'] = array( 'name'        => 'list_count',
                                      'call_method' => array( 'class'  => 'eZTagsFunctionCollection',
@@ -91,7 +107,11 @@ $FunctionList['list_count'] = array( 'name'        => 'list_count',
                                                              array( 'name'     => 'language',
                                                                     'type'     => 'string',
                                                                     'required' => false,
-                                                                    'default'  => false ) ) );
+                                                                    'default'  => false ) ),
+                                                             array( 'name'     => 'ignore_visibility',
+                                                                    'type'     => 'bool',
+                                                                    'required' => false,
+                                                                    'default'  => null ) );
 
 $FunctionList['tree'] = array( 'name'        => 'tree',
                                'call_method' => array( 'class'  => 'eZTagsFunctionCollection',
@@ -126,7 +146,11 @@ $FunctionList['tree'] = array( 'name'        => 'tree',
                                                        array( 'name'     => 'language',
                                                               'type'     => 'string',
                                                               'required' => false,
-                                                              'default'  => false ) ) );
+                                                              'default'  => false ),
+                                                       array( 'name'     => 'ignore_visibility',
+                                                              'type'     => 'bool',
+                                                              'required' => false,
+                                                              'default'  => null ) ) );
 
 $FunctionList['tree_count'] = array( 'name'        => 'tree_count',
                                      'call_method' => array( 'class'  => 'eZTagsFunctionCollection',
@@ -149,7 +173,11 @@ $FunctionList['tree_count'] = array( 'name'        => 'tree_count',
                                                              array( 'name'     => 'language',
                                                                     'type'     => 'string',
                                                                     'required' => false,
-                                                                    'default'  => false ) ) );
+                                                                    'default'  => false ),
+                                                             array( 'name'     => 'ignore_visibility',
+                                                                    'type'     => 'bool',
+                                                                    'required' => false,
+                                                                    'default'  => null ) ) );
 
 $FunctionList['latest_tags'] = array( 'name'        => 'latest_tags',
                                       'call_method' => array( 'class'  => 'eZTagsFunctionCollection',
@@ -165,6 +193,10 @@ $FunctionList['latest_tags'] = array( 'name'        => 'latest_tags',
                                                               array( 'name'     => 'language',
                                                                      'type'     => 'string',
                                                                      'required' => false,
-                                                                     'default'  => false ) ) );
+                                                                     'default'  => false ),
+                                                              array( 'name'     => 'ignore_visibility',
+                                                                     'type'     => 'bool',
+                                                                     'required' => false,
+                                                                     'default'  => null ) ) );
 
 ?>

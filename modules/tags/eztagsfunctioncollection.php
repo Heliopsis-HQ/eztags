@@ -16,7 +16,7 @@ class eZTagsFunctionCollection
      *
      * @return array
      */
-    static public function fetchTag( $tagID, $language = false )
+    static public function fetchTag( $tagID, $language = false, $ignoreVisibility = null )
     {
         if ( $language )
         {
@@ -25,7 +25,7 @@ class eZTagsFunctionCollection
             eZContentLanguage::setPrioritizedLanguages( $language );
         }
 
-        $result = eZTagsObject::fetch( $tagID );
+        $result = eZTagsObject::fetch( $tagID, false, $ignoreVisibility );
 
         if ( $language )
             eZContentLanguage::clearPrioritizedLanguages();
@@ -46,7 +46,7 @@ class eZTagsFunctionCollection
      *
      * @return array
      */
-    static public function fetchTagsByKeyword( $keyword, $language = false )
+    static public function fetchTagsByKeyword( $keyword, $language = false, $ignoreVisibility = null )
     {
         if ( $language )
         {
@@ -76,7 +76,7 @@ class eZTagsFunctionCollection
             $keyword = array( 'like', $keyword );
         }
 
-        $result = eZTagsObject::fetchByKeyword( $keyword );
+        $result = eZTagsObject::fetchByKeyword( $keyword, false, $ignoreVisibility );
 
         if ( $language )
             eZContentLanguage::clearPrioritizedLanguages();
@@ -97,7 +97,7 @@ class eZTagsFunctionCollection
      *
      * @return array
      */
-    static public function fetchTagByRemoteID( $remoteID, $language = false )
+    static public function fetchTagByRemoteID( $remoteID, $language = false, $ignoreVisibility = null )
     {
         if ( $language )
         {
@@ -106,7 +106,7 @@ class eZTagsFunctionCollection
             eZContentLanguage::setPrioritizedLanguages( $language );
         }
 
-        $result = eZTagsObject::fetchByRemoteID( $remoteID );
+        $result = eZTagsObject::fetchByRemoteID( $remoteID, false, $ignoreVisibility );
 
         if ( $language )
             eZContentLanguage::clearPrioritizedLanguages();
@@ -133,7 +133,7 @@ class eZTagsFunctionCollection
      *
      * @return array
      */
-    static public function fetchTagTree( $parentTagID, $sortBy, $offset, $limit, $depth, $depthOperator, $includeSynonyms, $language = false )
+    static public function fetchTagTree( $parentTagID, $sortBy, $offset, $limit, $depth, $depthOperator, $includeSynonyms, $language = false, $ignoreVisibility = null )
     {
         if ( !is_numeric( $parentTagID ) || (int) $parentTagID < 0 )
             return array( 'result' => false );
@@ -141,7 +141,8 @@ class eZTagsFunctionCollection
         $params = array( 'SortBy' => $sortBy,
                          'Offset' => $offset,
                          'Limit'  => $limit,
-                         'IncludeSynonyms' => $includeSynonyms );
+                         'IncludeSynonyms' => $includeSynonyms,
+                         'IgnoreVisibility' => $ignoreVisibility );
 
         if ( $depth !== false )
         {
@@ -177,12 +178,13 @@ class eZTagsFunctionCollection
      *
      * @return array
      */
-    static public function fetchTagTreeCount( $parentTagID, $depth, $depthOperator, $includeSynonyms, $language = false )
+    static public function fetchTagTreeCount( $parentTagID, $depth, $depthOperator, $includeSynonyms, $language = false, $ignoreVisibility = null )
     {
         if ( !is_numeric( $parentTagID ) || (int) $parentTagID < 0 )
             return array( 'result' => 0 );
 
-        $params = array( 'IncludeSynonyms' => $includeSynonyms );
+        $params = array( 'IncludeSynonyms' => $includeSynonyms,
+                         'IgnoreVisibility' => $ignoreVisibility );
 
         if ( $depth !== false )
         {
@@ -216,7 +218,7 @@ class eZTagsFunctionCollection
      *
      * @return array
      */
-    static public function fetchLatestTags( $parentTagID = false, $limit = 0, $language = false )
+    static public function fetchLatestTags( $parentTagID = false, $limit = 0, $language = false, $ignoreVisibility = null )
     {
         $parentTagID = (int) $parentTagID;
 
@@ -236,7 +238,10 @@ class eZTagsFunctionCollection
 
         $result = eZTagsObject::fetchList( $filterArray,
                                            array( 'offset' => 0, 'limit' => $limit ),
-                                           array( 'modified' => 'desc' ) );
+                                           array( 'modified' => 'desc' ),
+                                           false,
+                                           false,
+                                           $ignoreVisibility );
 
         if ( $language )
             eZContentLanguage::clearPrioritizedLanguages();
