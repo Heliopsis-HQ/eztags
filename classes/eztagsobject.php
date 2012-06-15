@@ -1324,7 +1324,12 @@ class eZTagsObject extends eZPersistentObject
      */
     public function translationByLocale( $locale )
     {
-        return eZTagsKeyword::fetch( $this->attribute( 'id' ), $locale );
+        $translation = eZTagsKeyword::fetch( $this->attribute( 'id' ), $locale );
+        if( !$translation instanceof eZTagsKeyword && $this->isAlwaysAvailable() )
+        {
+            $translation = $this->getMainTranslation();
+        }
+        return $translation;
     }
 
     /**

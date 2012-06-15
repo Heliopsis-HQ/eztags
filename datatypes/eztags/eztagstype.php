@@ -358,7 +358,11 @@ class eZTagsType extends eZDataType
                 $tag = $tag->getMainTag();
 
             if ( $tag instanceof eZTagsObject && ( $indexHidden || $tag->isVisible() ) )
-                $keywords[] = $tag->attribute( 'keyword' );
+            {
+                $keyword = $tag->getKeyword( $attribute->attribute( 'language_code' ) );
+                if( $keyword )
+                    $keywords[] = $keyword;
+            }
         }
 
         return implode( ', ', array_unique( $keywords ) );
