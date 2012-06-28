@@ -360,14 +360,14 @@ class eZTagsType extends eZDataType
             if ( $tag instanceof eZTagsObject && ( $indexHidden || $tag->isVisible() ) )
             {
                 $keyword = $tag->getKeyword( $attribute->attribute( 'language_code' ) );
-                if( !$keyword )
+                if ( !$keyword )
                 {
                     //fall back to main language
                     $mainLanguage = eZContentLanguage::fetch( $tag->attribute( 'main_language_id') );
-                    if( $mainLanguage instanceof eZContentLanguage )
+                    if ( $mainLanguage instanceof eZContentLanguage )
                         $keyword = $tag->getKeyword( $mainLanguage->attribute( 'locale' ) );
                 }
-                if( $keyword )
+                if ( $keyword )
                     $keywords[] = $keyword;
             }
         }
