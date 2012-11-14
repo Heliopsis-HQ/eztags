@@ -74,6 +74,7 @@ class eZTags
                       'locales',
                       'id_string',
                       'keyword_string',
+                      'meta_keyword_string',
                       'parent_string',
                       'locale_string' );
     }
@@ -123,6 +124,8 @@ class eZTags
             return $this->idString();
         else if ( $name == 'keyword_string' )
             return $this->keywordString();
+        else if ( $name == 'meta_keyword_string' )
+            return $this->metaKeywordString();
         else if ( $name == 'parent_string' )
             return $this->parentString();
         else if ( $name == 'locale_string' )
@@ -402,6 +405,7 @@ class eZTags
         {
             $permissionArray['allowed_locations_tags'] = array();
 
+            /** @var eZTagsObject[] $userLimitations */
             $userLimitations = eZTagsObject::fetchList( array( 'id' => array( $userLimitations ) ), null, null, true );
             if ( is_array( $userLimitations ) && !empty( $userLimitations ) )
             {
@@ -414,6 +418,7 @@ class eZTags
         }
         else if ( $limitTag instanceof eZTagsObject )
         {
+            /** @var eZTagsObject[] $userLimitations */
             $userLimitations = eZTagsObject::fetchList( array( 'id' => array( $userLimitations ) ), null, null, true );
             if ( is_array( $userLimitations ) && !empty( $userLimitations ) )
             {
@@ -614,6 +619,25 @@ class eZTags
     }
 
     /**
+     * Returns the keywords as a string
+     *
+     * @return string
+     */
+    public function metaKeywordString()
+    {
+        $tagKeywords = array_map(
+        function( $tag )
+            {
+                /** @var eZTagsObject $tag */
+                return $tag->attribute( 'keyword' );
+            },
+            $this->tags()
+        );
+
+        return !empty( $tagKeywords ) ? implode( ', ', $tagKeywords ) : '';
+    }
+
+    /**
      * Returns the parent IDs as a string
      *
      * @return string
@@ -633,5 +657,3 @@ class eZTags
         return implode( '|#', $this->LocaleArray );
     }
 }
-
-?>

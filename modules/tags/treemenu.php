@@ -90,5 +90,3 @@ header( 'Content-Length: '. strlen( $jsonText ) );
 
 echo $jsonText;
 eZExecution::cleanExit();
-
-?>

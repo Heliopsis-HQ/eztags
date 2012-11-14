@@ -7,7 +7,7 @@
 
 ## Optional extensions
 
-   * eZ Find (used for tags suggestion and related tags feature)
+   * eZ Find (used for tags suggestion, related tags feature and tag cloud over Solr)
 
 ## Upgrade
 
@@ -72,12 +72,13 @@ Virtual Host mode
 
 For anonymous users to be able to see tags on your site, grant access to `view` function of `tags` module to Anonymous role
 
-### (OPTIONAL) - If you wish to use tags suggestions and see related tags, you must use ezfind extension
+### OPTIONAL: Configure eZ Find schema for eZ Tags extension
 
-Edit the file `extension/ezfind/java/solr/conf/schema.xml` to add the following lines and then restart Tomcat/Jetty:
+eZ Find is used for tag suggestions, tags cloud over Solr and fetching of related tags. eZ Find is NOT REQUIRED to be enabled if you
+will not use these features. However, if you wish to use them, you'll need to activate eZ Find and patch the `schema.xml` file inside
+eZ Find extension with lines below.
 
-* Inside `<fields>` element add (without starting and ending quote):
+Edit the file `extension/ezfind/java/solr/conf/schema.xml`, add the following inside `<fields>` element and then restart Tomcat/Jetty:
 
-    `<field name="ezf_df_tags" type="lckeyword" indexed="true" stored="true" multiValued="true" termVectors="true"/>`
-
-    `<field name="ezf_df_tag_ids" type="sint" indexed="true" stored="true" multiValued="true" termVectors="true"/>`
+    <field name="ezf_df_tags" type="lckeyword" indexed="true" stored="true" multiValued="true" termVectors="true"/>
+    <field name="ezf_df_tag_ids" type="sint" indexed="true" stored="true" multiValued="true" termVectors="true"/>

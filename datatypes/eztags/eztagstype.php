@@ -24,7 +24,7 @@ class eZTagsType extends eZDataType
      */
     function __construct()
     {
-        parent::__construct( self::DATA_TYPE_STRING, ezpI18n::tr( 'extension/eztags/datatypes', 'Tags' ), array( 'serialize_supported' => true ) );
+        parent::eZDataType( self::DATA_TYPE_STRING, ezpI18n::tr( 'extension/eztags/datatypes', 'Tags' ), array( 'serialize_supported' => true ) );
     }
 
     /**
@@ -363,6 +363,7 @@ class eZTagsType extends eZDataType
                 if ( !$keyword )
                 {
                     //fall back to main language
+                    /** @var eZContentLanguage $mainLanguage */
                     $mainLanguage = eZContentLanguage::fetch( $tag->attribute( 'main_language_id') );
                     if ( $mainLanguage instanceof eZContentLanguage )
                         $keyword = $tag->getKeyword( $mainLanguage->attribute( 'locale' ) );
@@ -588,5 +589,3 @@ class eZTagsType extends eZDataType
 }
 
 eZDataType::register( eZTagsType::DATA_TYPE_STRING, 'eZTagsType' );
-
-?>

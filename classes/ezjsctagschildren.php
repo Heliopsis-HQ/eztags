@@ -21,10 +21,9 @@ class ezjscTagsChildren extends ezjscServerFunctions
         $filter = urldecode( trim( $http->getVariable( 'filter', '' ) ) );
 
         if ( !isset( $args[0] ) || !is_numeric( $args[0] ) )
-            return json_encode( array( 'count' => 0, 'offset' => false, 'filter' => $filter, 'data' => array() ) );
+            return array( 'count' => 0, 'offset' => false, 'filter' => $filter, 'data' => array() );
 
         $offset = false;
-        $limit = false;
         $limits = null;
 
         if ( $http->hasGetVariable( 'offset' ) )
@@ -55,11 +54,12 @@ class ezjscTagsChildren extends ezjscServerFunctions
         if ( !empty( $filter ) )
             $fetchParams['keyword'] = array( 'like', '%' . $filter . '%' );
 
+        /** @var eZTagsObject[] $children */
         $children = eZTagsObject::fetchList( $fetchParams, $limits, $sorts );
         $childrenCount = eZTagsObject::fetchListCount( $fetchParams );
 
         if ( !is_array( $children ) || empty( $children ) )
-            return json_encode( array( 'count' => 0, 'offset' => false, 'filter' => $filter, 'data' => array() ) );
+            return array( 'count' => 0, 'offset' => false, 'filter' => $filter, 'data' => array() );
 
         $dataArray = array();
         foreach ( $children as $child )
@@ -79,15 +79,11 @@ class ezjscTagsChildren extends ezjscServerFunctions
             $dataArray[] = $tagArray;
         }
 
-        return json_encode(
-            array(
-                'count'  => $childrenCount,
-                'offset' => $offset,
-                'filter' => $filter,
-                'data'   => $dataArray
-            )
+        return array(
+            'count'  => $childrenCount,
+            'offset' => $offset,
+            'filter' => $filter,
+            'data'   => $dataArray
         );
     }
 }
-
-?>

@@ -23,6 +23,7 @@ if ( $mainTag->attribute( 'main_tag_id' ) != 0 )
 
 if ( $locale === false )
 {
+    /** @var eZContentLanguage[] $languages */
     $languages = eZContentLanguage::prioritizedLanguages();
     if ( !is_array( $languages ) || empty( $languages ) )
         return $Module->handleError( eZError::KERNEL_NOT_FOUND, 'kernel' );
@@ -122,5 +123,3 @@ $Result['content']    = $tpl->fetch( 'design:tags/addsynonym.tpl' );
 $Result['ui_context'] = 'edit';
 $Result['path']       = eZTagsObject::generateModuleResultPath( $mainTag, null,
                                                                 ezpI18n::tr( 'extension/eztags/tags/edit', 'New synonym tag' ) );
-
-?>
